@@ -15,24 +15,24 @@ import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
 @Service
-public class KucoinDataProvider implements CryptoDataProvider {
-    private static final String KUCOIN_BASE_URL = "https://api.kucoin.com";
-    private static final Market MARKET = Market.KUCOIN;
+public class KrakenDataProvider implements CryptoDataProvider {
+    private static final String KRAKEN_BASE_URL = "https://api.kraken.com";
+    private static final Market MARKET = Market.KRAKEN;
 
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
 
-    public KucoinDataProvider() {
+    public KrakenDataProvider() {
         this.httpClient = HttpClient.newHttpClient();
         this.objectMapper = new ObjectMapper();
     }
 
     public MarketPrice getCurrentPrices() {
-        String btcUsdtEndpoint = "/api/v1/market/orderbook/level1?symbol=BTC-USDT";
-        String ethUsdtEndpoint = "/api/v1/market/orderbook/level1?symbol=ETH-USDT";
+        String btcUsdtEndpoint = "/0/public/Ticker?pair=XBTUSDT";
+        String ethUsdtEndpoint = "/0/public/Ticker?pair=ETHUSDT";
 
-        String btcUsdtCurrentPrice = getCoinCurrentPrice(btcUsdtEndpoint);
-        String ethUsdtCurrentPrice = getCoinCurrentPrice(ethUsdtEndpoint);
+        String btcUsdtCurrentPrice = getCoinCurrentPrice(btcUsdtEndpoint, "XBTUSDT");
+        String ethUsdtCurrentPrice = getCoinCurrentPrice(ethUsdtEndpoint, "ETHUSDT");
 
         List<Price> prices =
                 List.of(new Price("BTC", "USDT", btcUsdtCurrentPrice), new Price("ETH", "USDT", ethUsdtCurrentPrice));
@@ -41,17 +41,19 @@ public class KucoinDataProvider implements CryptoDataProvider {
     }
 
     @SneakyThrows
-    private String getCoinCurrentPrice(String endpoint) {
+    private String getCoinCurrentPrice(String endpoint, String pair) {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(KUCOIN_BASE_URL + endpoint))
+                .uri(URI.create(KRAKEN_BASE_URL + endpoint))
                 .GET()
                 .build();
 
         HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         Map<String, Object> responseData = objectMapper.readValue(response.body(), new TypeReference<>() {});
 
-        Map<String, Object> data = (Map<String, Object>) responseData.get("data");
-        String price = (String) data.get("price");
+        Map<String, Object> result = (Map<String, Object>) responseData.get("result");
+        Map<String, Object> symbol = (Map<String, Object>) result.get(pair);
+        List<String> askedPrice = (List<String>) symbol.get("a");
+        String price = askedPrice.get(0);
 
         return price;
     }
