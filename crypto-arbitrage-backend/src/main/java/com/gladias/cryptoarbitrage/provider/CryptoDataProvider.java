@@ -1,7 +1,8 @@
 package com.gladias.cryptoarbitrage.provider;
 
-import com.gladias.cryptoarbitrage.dto.MarketPrice;
+import com.gladias.cryptoarbitrage.dto.FeeLevel;
+import com.gladias.cryptoarbitrage.dto.MarketCurrentData;
 
 public interface CryptoDataProvider {
-    MarketPrice getCurrentPrices();
+    MarketCurrentData getCurrentMarketData(String coin, FeeLevel feeLevel);
 }
