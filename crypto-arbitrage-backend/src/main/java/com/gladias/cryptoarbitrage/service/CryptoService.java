@@ -1,5 +1,6 @@
 package com.gladias.cryptoarbitrage.service;
 
+import com.gladias.cryptoarbitrage.dto.ArbitrageOption;
 import com.gladias.cryptoarbitrage.dto.CurrentMarketAnalysis;
 import com.gladias.cryptoarbitrage.dto.Fee;
 import com.gladias.cryptoarbitrage.dto.FeeLevel;
@@ -24,7 +25,10 @@ public class CryptoService {
         MarketCurrentData kraken = krakenDataProvider.getCurrentMarketData(coin, feeLevel);
         MarketCurrentData kucoin = kucoinDataProvider.getCurrentMarketData(coin, feeLevel);
 
-        return new CurrentMarketAnalysis(List.of(binance, kraken, kucoin));
+        List<MarketCurrentData> markets = List.of(binance, kraken, kucoin);
+        List<ArbitrageOption> bestArbitrageOptions = ArbitrageAnalysisService.findBestArbitrageOptions(markets, coin);
+
+        return new CurrentMarketAnalysis(markets, bestArbitrageOptions);
     }
 
     public static String getPriceDifference(String firstPrice, String secondPrice) {
