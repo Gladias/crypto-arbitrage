@@ -1,38 +1,116 @@
 .App {
-  text-align: center;
+  width: 100vw;
+  height: 100vh;
+  background-color: #FEFAE0;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.main {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.first-column {
   display: flex;
   flex-direction: column;
+  width: 100%;
   align-items: center;
+}
+
+.title {
+  width: 100%;
+  height: 5%;
+  display: flex;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.market-titles {
+  width: 60%;
+  height: 5%;
+  display: flex;
+  flex-direction: row;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.market-titles>div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+.logos-section {
+  width: 60%;
+  height: 10%;
+  display: flex;
+  flex-direction: row;
+}
+
+.logos-section>div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.logos-section>div>img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.data-section {
+  width: 100%;
+  height: 50%;
+  display: flex;
+  flex-direction: row;
+}
+
+.data-titles {
+  width: 15%;
+}
+
+.data {
+  width: 20%;
+  display: flex;
+  flex-direction: column;
+}
+
+.data>div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.data {
+  width: 20%;
+}
+
+.data {
+  width: 20%;
+}
+
+.arbitrage {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 25%;
+}
+
+.arbitrage>div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
 }
