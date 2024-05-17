@@ -30,7 +30,7 @@ public class ArbitrageAnalysisService {
                                 sellCryptoAtMarket.market(),
                                 profit);
 
-                        String color = profit > 0 ? "#80B918" : "#EE6055";
+                        String color = profit > 0 ? "GREEN" : "RED";
                         opportunitiesByProfit.put(profit, new ArbitrageOption(description, profit, color));
                     }
                 }

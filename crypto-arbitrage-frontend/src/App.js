@@ -194,22 +194,22 @@ function App() {
             <div className="bottom-area">
               <div className="arbitrage-1">
                 <h4>Most valuable trade </h4>
-                <p>{data && data.arbitrageOptions[0].description}</p>
+                <h4 className={data && data.arbitrageOptions[0].color}>{data && data.arbitrageOptions[0].description}</h4>
               </div>
               <div className="arbitrage-2">
                 <h4>Second most valuable trade </h4>
-                <p>{data && data.arbitrageOptions[1].description}</p>
+                <h4 className={data && data.arbitrageOptions[0].color}>{data && data.arbitrageOptions[1].description}</h4>
               </div>
               <div className="arbitrage-3">
                 <h4>Third most valuable trade </h4>
-                <p>{data && data.arbitrageOptions[2].description}</p>
+                <h4 className={data && data.arbitrageOptions[0].color}>{data && data.arbitrageOptions[2].description}</h4>
               </div>
             </div>
             <div className="settings-area">
               <h3>Settings</h3>
               <div className="coins">
-                <img src={btc} alt='BTC Logo' onClick={() => setCoin("BTC")}/>
-                <img src={eth} alt='ETH Logo' onClick={() => setCoin("ETH")}/>
+                <img src={btc} alt='BTC Logo' onClick={() => setCoin("BTC")} />
+                <img src={eth} alt='ETH Logo' onClick={() => setCoin("ETH")} />
               </div>
               <div className="fee">
                 <h4>Fee Level</h4>
