@@ -5,11 +5,16 @@ import com.gladias.cryptoarbitrage.dto.CurrentMarketAnalysis;
 import com.gladias.cryptoarbitrage.dto.Fee;
 import com.gladias.cryptoarbitrage.dto.FeeLevel;
 import com.gladias.cryptoarbitrage.dto.MarketCurrentData;
+import com.gladias.cryptoarbitrage.dto.Price;
+import com.gladias.cryptoarbitrage.dto.Volume;
 import com.gladias.cryptoarbitrage.provider.BinanceDataProvider;
 import com.gladias.cryptoarbitrage.provider.KrakenDataProvider;
 import com.gladias.cryptoarbitrage.provider.KucoinDataProvider;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
@@ -20,15 +25,23 @@ public class CryptoService {
     private final KrakenDataProvider krakenDataProvider;
     private final KucoinDataProvider kucoinDataProvider;
 
+    @SneakyThrows
     public CurrentMarketAnalysis getCurrentMarketsData(String coin, FeeLevel feeLevel) {
-        MarketCurrentData binance = binanceDataProvider.getCurrentMarketData(coin, feeLevel);
-        MarketCurrentData kraken = krakenDataProvider.getCurrentMarketData(coin, feeLevel);
-        MarketCurrentData kucoin = kucoinDataProvider.getCurrentMarketData(coin, feeLevel);
+        CompletableFuture<MarketCurrentData> binanceFuture =
+                CompletableFuture.supplyAsync(() -> binanceDataProvider.getCurrentMarketData(coin, feeLevel));
 
-        List<MarketCurrentData> markets = List.of(binance, kraken, kucoin);
+        CompletableFuture<MarketCurrentData> krakenFuture =
+                CompletableFuture.supplyAsync(() -> krakenDataProvider.getCurrentMarketData(coin, feeLevel));
+
+        CompletableFuture<MarketCurrentData> kucoinFuture =
+                CompletableFuture.supplyAsync(() -> kucoinDataProvider.getCurrentMarketData(coin, feeLevel));
+
+        List<MarketCurrentData> markets = List.of(binanceFuture.get(), krakenFuture.get(), kucoinFuture.get());
         List<ArbitrageOption> bestArbitrageOptions = ArbitrageAnalysisService.findBestArbitrageOptions(markets, coin);
 
-        return new CurrentMarketAnalysis(markets, bestArbitrageOptions);
+        List<MarketCurrentData> marketsWithRoundedPrices = getMarketsWithRoundedPrices(markets);
+
+        return new CurrentMarketAnalysis(marketsWithRoundedPrices, bestArbitrageOptions);
     }
 
     public static String getPriceDifference(String firstPrice, String secondPrice) {
@@ -56,5 +69,45 @@ public class CryptoService {
                 makerFeeForCurrentBidPrice,
                 takerFeeForCurrentAskPrice,
                 takerFeeForCurrentBidPrice);
+    }
+
+    private static List<MarketCurrentData> getMarketsWithRoundedPrices(List<MarketCurrentData> markets) {
+        List<MarketCurrentData> marketsWithRoundedPrices = new ArrayList<>(3);
+
+        for (MarketCurrentData market : markets) {
+            Volume roundedVolume =
+                    new Volume(convertTo5DecimalPlaces(market.volume().last24HrsVolume()));
+
+            String constantFeeForTaker =
+                    "%.4f".formatted(Double.parseDouble(market.fee().constantFeeForTaker()) * 100.0) + "%";
+            String constantFeeForMaker =
+                    "%.4f".formatted(Double.parseDouble(market.fee().constantFeeForMaker()) * 100.0) + "%";
+
+            Fee roundedFee = new Fee(
+                    constantFeeForMaker,
+                    constantFeeForTaker,
+                    convertTo5DecimalPlaces(market.fee().makerFeeForCurrentAskPrice()),
+                    convertTo5DecimalPlaces(market.fee().makerFeeForCurrentBidPrice()),
+                    convertTo5DecimalPlaces(market.fee().takerFeeForCurrentAskPrice()),
+                    convertTo5DecimalPlaces(market.fee().takerFeeForCurrentBidPrice()));
+
+            Price roundedPrice = new Price(
+                    market.price().coin(),
+                    market.price().currency(),
+                    convertTo5DecimalPlaces(market.price().bidPrice()),
+                    convertTo5DecimalPlaces(market.price().askPrice()),
+                    convertTo5DecimalPlaces(market.price().bidQuantity()),
+                    convertTo5DecimalPlaces(market.price().askQuantity()),
+                    convertTo5DecimalPlaces(market.price().askAndBidPriceSpread()));
+
+            marketsWithRoundedPrices.add(
+                    new MarketCurrentData(market.market(), roundedPrice, roundedVolume, roundedFee));
+        }
+
+        return marketsWithRoundedPrices;
+    }
+
+    private static String convertTo5DecimalPlaces(String price) {
+        return "%.5f".formatted(Double.parseDouble(price));
     }
 }

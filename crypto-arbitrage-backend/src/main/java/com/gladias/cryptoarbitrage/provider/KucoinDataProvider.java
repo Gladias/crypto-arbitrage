@@ -15,9 +15,11 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Map;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class KucoinDataProvider implements CryptoDataProvider {
     private static final String KUCOIN_BASE_URL = "https://api.kucoin.com";
@@ -56,6 +58,7 @@ public class KucoinDataProvider implements CryptoDataProvider {
         String askQty = (String) innerResponseData.get("bestAskSize");
         String bidQty = (String) innerResponseData.get("bestBidSize");
 
+        log.info("Fetched data from KuCoin");
         return new Price(
                 coin, "USDT", bidPrice, askPrice, bidQty, askQty, CryptoService.getPriceDifference(askPrice, bidPrice));
     }

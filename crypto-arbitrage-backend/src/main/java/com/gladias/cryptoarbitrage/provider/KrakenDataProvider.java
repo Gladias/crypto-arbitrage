@@ -16,9 +16,11 @@ import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class KrakenDataProvider implements CryptoDataProvider {
     private static final String KRAKEN_BASE_URL = "https://api.kraken.com";
@@ -63,6 +65,7 @@ public class KrakenDataProvider implements CryptoDataProvider {
         Fee fee = CryptoService.getFeeForCurrentPriceAndLevel(getFeesForGivenLevel(feeLevel), askPrice, bidPrice);
         Volume volume = new Volume(volumeForLast24Hrs);
 
+        log.info("Fetched data from Kraken");
         return new MarketCurrentData(MARKET, price, volume, fee);
     }
 

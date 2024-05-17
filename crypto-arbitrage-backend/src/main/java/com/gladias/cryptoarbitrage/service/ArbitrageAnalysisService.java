@@ -21,7 +21,7 @@ public class ArbitrageAnalysisService {
                         double profit = arbitrageOptionProfit(buyCryptoAtMarket, sellCryptoAtMarket, maxAmount);
 
                         String description = String.format(
-                                "Buy %.2f %s on %s and Sell %.2f %s on %s with profit %.2f USDT",
+                                "Buy %.5f %s on %s and Sell %.5f %s on %s with profit %.5f USDT",
                                 maxAmount,
                                 coin,
                                 buyCryptoAtMarket.market(),

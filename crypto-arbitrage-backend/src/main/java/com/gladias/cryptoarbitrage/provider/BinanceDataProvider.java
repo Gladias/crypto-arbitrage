@@ -15,9 +15,11 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Map;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 public class BinanceDataProvider implements CryptoDataProvider {
     private static final String BINANCE_BASE_URL = "https://api.binance.com";
@@ -39,6 +41,7 @@ public class BinanceDataProvider implements CryptoDataProvider {
         Fee fee = CryptoService.getFeeForCurrentPriceAndLevel(
                 getFeesForGivenLevel(feeLevel), currentPrice.askPrice(), currentPrice.bidPrice());
 
+        log.info("Fetched data from Binance");
         return new MarketCurrentData(MARKET, currentPrice, volume, fee);
     }
 
