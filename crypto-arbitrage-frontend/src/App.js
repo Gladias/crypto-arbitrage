@@ -1,3 +1,5 @@
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import './App.css';
 import binance from './assets/binance.svg';
 import kraken from './assets/kraken.svg';
@@ -6,6 +8,29 @@ import btc from './assets/btc.svg';
 import eth from './assets/eth.svg';
 
 function App() {
+  const [data, setData] = useState(null);
+  const [coin, setCoin] = useState("BTC");
+  const [feeLevel, setFeeLevel] = useState("REGULAR_USER");
+  const [intervalTime, setIntervalTime] = useState(120000);
+
+  useEffect(() => {
+    const fetchData = () => {
+      axios.get('http://localhost:8080/api/markets' + '?coin=' + coin + '&feeLevel=' + feeLevel)
+        .then(response => {
+          setData(response.data);
+          console.log(response.data);
+          console.log(response.data.arbitrageOptions);
+        });
+    };
+
+    fetchData(); // Initial fetch
+
+    const intervalId = setInterval(fetchData, intervalTime);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(intervalId);
+  }, [coin, feeLevel, intervalTime]);
+
   return (
     <div className="App">
       <div className="main">
@@ -42,16 +67,16 @@ function App() {
                   <h3>Price</h3>
                 </div>
                 <div className="price-1">
-                  <h5>Ask price</h5>
-                  <h5>Ask quantity</h5>
+                  <h4>Ask price</h4>
+                  <h4>Ask quantity</h4>
                 </div>
                 <div className="price-2">
-                  <h5>Bid price</h5>
-                  <h5>Bid quantity</h5>
+                  <h4>Bid price</h4>
+                  <h4>Bid quantity</h4>
                 </div>
                 <div className="price-3">
-                  <h5>Ask and bid price spread</h5>
-                  <h5>Volume for last 24 hours</h5>
+                  <h4>Ask and bid price spread</h4>
+                  <h4>Volume for last 24 hours</h4>
                 </div>
               </div>
               <div className="fees-titles">
@@ -59,12 +84,12 @@ function App() {
                   <h3>Fees</h3>
                 </div>
                 <div className="fee-1">
-                  <h5>Constant fee for maker</h5>
-                  <h5>Constant fee for taker</h5>
+                  <h4>Constant fee for maker</h4>
+                  <h4>Constant fee for taker</h4>
                 </div>
                 <div className="fee-2">
-                  <h5>Maker fee for current prices</h5>
-                  <h5>Taker fee for current prices</h5>
+                  <h4>Taker fee for current ask price</h4>
+                  <h4>Taker fee for current bid price</h4>
                 </div>
               </div>
             </div>
@@ -74,16 +99,16 @@ function App() {
                   <h3>-----</h3>
                 </div>
                 <div className="price-1">
-                  <h5>123.312</h5>
-                  <h5>123.312</h5>
+                  <h4>{data && data.markets[0].price.askPrice}</h4>
+                  <h4>{data && data.markets[0].price.askQuantity}</h4>
                 </div>
                 <div className="price-2">
-                  <h5>123.312</h5>
-                  <h5>123.312</h5>
+                  <h4>{data && data.markets[0].price.bidPrice}</h4>
+                  <h4>{data && data.markets[0].price.bidQuantity}</h4>
                 </div>
                 <div className="price-3">
-                  <h5>123.312</h5>
-                  <h5>123.312</h5>
+                  <h4>{data && data.markets[0].price.askAndBidPriceSpread}</h4>
+                  <h4>{data && data.markets[0].volume.last24HrsVolume}</h4>
                 </div>
               </div>
               <div className="fees-titles">
@@ -91,12 +116,12 @@ function App() {
                   <h3>-----</h3>
                 </div>
                 <div className="fee-1">
-                  <h5>123.312</h5>
-                  <h5>123.312</h5>
+                  <h4>{data && data.markets[0].fee.constantFeeForMaker}</h4>
+                  <h4>{data && data.markets[0].fee.constantFeeForTaker}</h4>
                 </div>
                 <div className="fee-2">
-                  <h5>123.312</h5>
-                  <h5>123.312</h5>
+                  <h4>{data && data.markets[0].fee.takerFeeForCurrentAskPrice}</h4>
+                  <h4>{data && data.markets[0].fee.takerFeeForCurrentBidPrice}</h4>
                 </div>
               </div>
             </div>
@@ -106,16 +131,16 @@ function App() {
                   <h3>-----</h3>
                 </div>
                 <div className="price-1">
-                  <h5>123.312</h5>
-                  <h5>123.312</h5>
+                  <h4>{data && data.markets[1].price.askPrice}</h4>
+                  <h4>{data && data.markets[1].price.askQuantity}</h4>
                 </div>
                 <div className="price-2">
-                  <h5>123.312</h5>
-                  <h5>123.312</h5>
+                  <h4>{data && data.markets[1].price.bidPrice}</h4>
+                  <h4>{data && data.markets[1].price.bidQuantity}</h4>
                 </div>
                 <div className="price-3">
-                  <h5>123.312</h5>
-                  <h5>123.312</h5>
+                  <h4>{data && data.markets[1].price.askAndBidPriceSpread}</h4>
+                  <h4>{data && data.markets[1].volume.last24HrsVolume}</h4>
                 </div>
               </div>
               <div className="fees-titles">
@@ -123,12 +148,12 @@ function App() {
                   <h3>-----</h3>
                 </div>
                 <div className="fee-1">
-                  <h5>123.312</h5>
-                  <h5>123.312</h5>
+                  <h4>{data && data.markets[1].fee.constantFeeForMaker}</h4>
+                  <h4>{data && data.markets[1].fee.constantFeeForTaker}</h4>
                 </div>
                 <div className="fee-2">
-                  <h5>123.312</h5>
-                  <h5>123.312</h5>
+                  <h4>{data && data.markets[1].fee.takerFeeForCurrentAskPrice}</h4>
+                  <h4>{data && data.markets[1].fee.takerFeeForCurrentBidPrice}</h4>
                 </div>
               </div>
             </div>
@@ -138,16 +163,16 @@ function App() {
                   <h3>-----</h3>
                 </div>
                 <div className="price-1">
-                  <h5>123.312</h5>
-                  <h5>123.312</h5>
+                  <h4>{data && data.markets[2].price.askPrice}</h4>
+                  <h4>{data && data.markets[2].price.askQuantity}</h4>
                 </div>
                 <div className="price-2">
-                  <h5>123.312</h5>
-                  <h5>123.312</h5>
+                  <h4>{data && data.markets[2].price.bidPrice}</h4>
+                  <h4>{data && data.markets[2].price.bidQuantity}</h4>
                 </div>
                 <div className="price-3">
-                  <h5>123.312</h5>
-                  <h5>123.312</h5>
+                  <h4>{data && data.markets[2].price.askAndBidPriceSpread}</h4>
+                  <h4>{data && data.markets[2].volume.last24HrsVolume}</h4>
                 </div>
               </div>
               <div className="fees-titles">
@@ -155,12 +180,12 @@ function App() {
                   <h3>-----</h3>
                 </div>
                 <div className="fee-1">
-                  <h5>123.312</h5>
-                  <h5>123.312</h5>
+                  <h4>{data && data.markets[2].fee.constantFeeForMaker}</h4>
+                  <h4>{data && data.markets[2].fee.constantFeeForTaker}</h4>
                 </div>
                 <div className="fee-2">
-                  <h5>123.312</h5>
-                  <h5>123.312</h5>
+                  <h4>{data && data.markets[2].fee.takerFeeForCurrentAskPrice}</h4>
+                  <h4>{data && data.markets[2].fee.takerFeeForCurrentBidPrice}</h4>
                 </div>
               </div>
             </div>
@@ -168,46 +193,46 @@ function App() {
           <div className="bottom-section">
             <div className="bottom-area">
               <div className="arbitrage-1">
-                <h5>Most valuable trade </h5>
-                <p>Buy 1.00 BTC on KRAKEN and Sell 1.00 BTC on BINANCE with profit 0.73 USDT</p>
+                <h4>Most valuable trade </h4>
+                <p>{data && data.arbitrageOptions[0].description}</p>
               </div>
               <div className="arbitrage-2">
-                <h5>Second most valuable trade </h5>
-                <p>Buy 1.00 BTC on KRAKEN and Sell 1.00 BTC on BINANCE with profit 0.73 USDT</p>
+                <h4>Second most valuable trade </h4>
+                <p>{data && data.arbitrageOptions[1].description}</p>
               </div>
               <div className="arbitrage-3">
-                <h5>Third most valuable trade </h5>
-                <p>Buy 1.00 BTC on KRAKEN and Sell 1.00 BTC on BINANCE with profit 0.73 USDT</p>
+                <h4>Third most valuable trade </h4>
+                <p>{data && data.arbitrageOptions[2].description}</p>
               </div>
             </div>
             <div className="settings-area">
               <h3>Settings</h3>
               <div className="coins">
-                <img src={btc} alt='BTC Logo' />
-                <img src={eth} alt='ETH Logo' />
+                <img src={btc} alt='BTC Logo' onClick={() => setCoin("BTC")}/>
+                <img src={eth} alt='ETH Logo' onClick={() => setCoin("ETH")}/>
               </div>
               <div className="fee">
                 <h4>Fee Level</h4>
-                <select name="feeLevel" id="feeLevelSelect">
+                <select name="feeLevel" id="feeLevelSelect" onChange={(event) => setFeeLevel(event.target.value)}>
                   <option value="REGULAR_USER">Regular User</option>
                   <option value="VIP_1">VIP 1</option>
-                  <option value="VIP_1">VIP 2</option>
-                  <option value="VIP_1">VIP 3</option>
-                  <option value="VIP_1">VIP 4</option>
-                  <option value="VIP_1">VIP 5</option>
-                  <option value="VIP_1">VIP 6</option>
-                  <option value="VIP_1">VIP 7</option>
-                  <option value="VIP_1">VIP 8</option>
-                  <option value="VIP_1">VIP 9</option>
-                  <option value="VIP_1">NONE</option>
+                  <option value="VIP_2">VIP 2</option>
+                  <option value="VIP_3">VIP 3</option>
+                  <option value="VIP_4">VIP 4</option>
+                  <option value="VIP_5">VIP 5</option>
+                  <option value="VIP_6">VIP 6</option>
+                  <option value="VIP_7">VIP 7</option>
+                  <option value="VIP_8">VIP 8</option>
+                  <option value="VIP_9">VIP 9</option>
+                  <option value="NONE">NONE</option>
                 </select>
               </div>
               <div className="refresh-rate">
                 <h4>Refresh Rate</h4>
-                <select name="feeLevel" id="feeLevelSelect">
-                  <option value="5seconds">5s</option>
-                  <option value="10seconds">10s</option>
-                  <option value="20seconds">20s</option>
+                <select name="feeLevel" id="feeLevelSelect" onChange={(event) => setIntervalTime(event.target.value)}>
+                  <option value="5000">5s</option>
+                  <option selected value="10000">10s</option>
+                  <option value="20000">20s</option>
                 </select>
               </div>
             </div>
