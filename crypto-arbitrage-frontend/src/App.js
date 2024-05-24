@@ -11,7 +11,7 @@ function App() {
   const [data, setData] = useState(null);
   const [coin, setCoin] = useState("BTC");
   const [feeLevel, setFeeLevel] = useState("REGULAR_USER");
-  const [intervalTime, setIntervalTime] = useState(120000);
+  const [intervalTime, setIntervalTime] = useState(10000);
 
   useEffect(() => {
     const fetchData = () => {
@@ -230,6 +230,7 @@ function App() {
               <div className="refresh-rate">
                 <h4>Refresh Rate</h4>
                 <select name="feeLevel" id="feeLevelSelect" onChange={(event) => setIntervalTime(event.target.value)}>
+                  <option value="1000">1s</option>
                   <option value="5000">5s</option>
                   <option selected value="10000">10s</option>
                   <option value="20000">20s</option>
