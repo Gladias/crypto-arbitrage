@@ -7,9 +7,12 @@ import com.gladias.cryptoarbitrage.dto.FeeLevel;
 import com.gladias.cryptoarbitrage.dto.MarketCurrentData;
 import com.gladias.cryptoarbitrage.dto.Price;
 import com.gladias.cryptoarbitrage.dto.Volume;
+import com.gladias.cryptoarbitrage.entity.MarketDataEntity;
 import com.gladias.cryptoarbitrage.provider.BinanceDataProvider;
 import com.gladias.cryptoarbitrage.provider.KrakenDataProvider;
 import com.gladias.cryptoarbitrage.provider.KucoinDataProvider;
+import com.gladias.cryptoarbitrage.repository.MarketDataRepository;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -24,6 +27,7 @@ public class CryptoService {
     private final BinanceDataProvider binanceDataProvider;
     private final KrakenDataProvider krakenDataProvider;
     private final KucoinDataProvider kucoinDataProvider;
+    private final MarketDataRepository marketDataRepository;
 
     @SneakyThrows
     public CurrentMarketAnalysis getCurrentMarketsData(String coin, FeeLevel feeLevel) {
@@ -36,8 +40,23 @@ public class CryptoService {
         CompletableFuture<MarketCurrentData> kucoinFuture =
                 CompletableFuture.supplyAsync(() -> kucoinDataProvider.getCurrentMarketData(coin, feeLevel));
 
-        List<MarketCurrentData> markets = List.of(binanceFuture.get(), krakenFuture.get(), kucoinFuture.get());
+        MarketCurrentData binanceCurrentData = binanceFuture.get();
+        MarketCurrentData krakenCurrentData = krakenFuture.get();
+        MarketCurrentData kucoinCurrentData = kucoinFuture.get();
+        LocalDateTime dataFetchedAt = LocalDateTime.now();
+
+        List<MarketCurrentData> markets = List.of(binanceCurrentData, krakenCurrentData, kucoinCurrentData);
         List<ArbitrageOption> bestArbitrageOptions = ArbitrageAnalysisService.findBestArbitrageOptions(markets, coin);
+
+        MarketDataEntity marketDataEntity = MarketDataEntity.of(
+                binanceCurrentData,
+                krakenCurrentData,
+                kucoinCurrentData,
+                bestArbitrageOptions,
+                dataFetchedAt,
+                coin,
+                feeLevel.name());
+        marketDataRepository.save(marketDataEntity);
 
         List<MarketCurrentData> marketsWithRoundedPrices = getMarketsWithRoundedPrices(markets);
 
